@@ -7,28 +7,30 @@ Original file is located at
     https://colab.research.google.com/drive/1D9UeRoKAHf5D6HBrC2SmNYBtb1hkwlEi
 """
 
-# Import necessary libraries
+# Import libraries
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, roc_auc_score, accuracy_score
 import pickle
 import matplotlib.pyplot as plt
+import seaborn as sns
+from xgboost import XGBClassifier
 
 
 #_______________________________________________________________________________
 #CHAPTER 1______________________________________________________________________
 #_______________________________________________________________________________
 
-# Load CSV file directly (update the path to your CSV file)
-data = pd.read_csv("C:\\Users\\Yasin\\Documents\\Projects\\CreditRisk\\Loan_Data.csv")  # Replace with the actual file path
+# Loads CSV file directly (updates the path to my CSV file)
+data = pd.read_csv("C:\\Users\\Yasin\\Documents\\Projects\\CreditRisk\\Loan_Data.csv")  
 
 
-#1.3 Adjust Pandas display settings
+#1.3 Adjusts Pandas display settings
 pd.set_option('display.max_columns', None)  # Show all columns
 pd.set_option('display.width', 1000)       # Set a wider display width
 
-#1.4 Preview the data
+#1.4 Previews the data
 print("Data loaded successfully. Here's a preview:")
 print(data.head())
 
@@ -38,21 +40,21 @@ print(data.head())
 #CHAPTER 2______________________________________________________________________
 #_______________________________________________________________________________
 
-#2.1 Check for missing values
+#2.1 Checks for missing values
 missing_values = data.isnull().sum()
 print("\nMissing Values:")
 print(missing_values)
 print()
 
-#2.2 Describe the data (to check distributions and statistics)
+#2.2 Describes the data (to check distributions and statistics)
 print("\nDescriptive Statistics:")
 print(data.describe())
 
-#2.3 Drop unnecessary columns (e.g., customer_id) and separate features and target
-features = data.drop(columns=['default', 'customer_id'])  # Exclude target and IDs
-target = data['default']  # Target variable (whether the loan defaulted)
+#2.3 Drops unnecessary columns (e.g., customer_id) and separates features and target
+features = data.drop(columns=['default', 'customer_id'])  # Excludes target and IDs
+target = data['default']  # Targets variable (whether the loan defaulted)
 
-#2.4 Split the dataset into training and testing sets (80% train, 20% test)
+#2.4 Splits the dataset into training and testing sets (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
 
 print("\nData has been split:")
@@ -61,7 +63,7 @@ print(f"Testing Set: {X_test.shape}, {y_test.shape}")
 
 
 #_______________________________________________________________________________________________
-# CHAPTER 5(the part that was moved to be BEFORE chapter 3): Remove Highly Correlated Features and Retrain Model
+# CHAPTER 3(5): Removes Highly Correlated Features and Retraines Model
 #_______________________________________________________________________________________________
 features_filtered = features.drop(columns=['credit_lines_outstanding', 'total_debt_outstanding'])
 
@@ -76,10 +78,10 @@ print(f"Testing Set: {X_test_filtered.shape}, {y_test_filtered.shape}")
 
 
 #_______________________________________________________________________________
-# CHAPTER 3: Train and Evaluate Random Forest Model_____________________________
+# CHAPTER 3: Trains and Evaluates Random Forest Model_____________________________
 #_______________________________________________________________________________
 
-# Train the filtered Random Forest model
+# Trains the filtered Random Forest model
 rf_model_filtered = RandomForestClassifier(
     n_estimators=100,
     max_depth=10,
@@ -89,11 +91,11 @@ rf_model_filtered = RandomForestClassifier(
 
 rf_model_filtered.fit(X_train_filtered, y_train_filtered)
 
-# Make predictions on the filtered test set
+# Makes predictions on the filtered test set
 y_pred_filtered = rf_model_filtered.predict(X_test_filtered)
 y_pred_proba_filtered = rf_model_filtered.predict_proba(X_test_filtered)[:, 1]
 
-# Evaluate the filtered model's performance
+# Evaluates the filtered model's performance
 print("Filtered Model Performance Metrics:\n")
 print(f"Accuracy: {accuracy_score(y_test_filtered, y_pred_filtered):.2f}")
 print(f"AUC-ROC: {roc_auc_score(y_test_filtered, y_pred_proba_filtered):.2f}\n")
@@ -101,7 +103,7 @@ print("Classification Report:")
 print(classification_report(y_test_filtered, y_pred_filtered))
 
 
-# 3.6 Optional: Feature Importance
+# 3.6 Feature Importance
 import matplotlib.pyplot as plt
 
 # Feature importance for filtered features
@@ -113,9 +115,6 @@ feature_importances_filtered = pd.DataFrame({
 
 print(f"\nNumber of Features in Model: {len(rf_model_filtered.feature_importances_)}")
 print(f"Features Used: {features_filtered.columns.tolist()}")
-
-
-
 
 
 # Plot filtered feature importances
@@ -133,24 +132,22 @@ print("\nFeature importance plot complete. Now starting the interactive Probabil
 #_______________________________________________________________________________
 # CHAPTER 4: Test for Data Leakage______________________________________________
 #_______________________________________________________________________________
-import seaborn as sns
-import matplotlib.pyplot as plt
 
-# 4.1 Compute correlation matrix
+# 4.1 Computes correlation matrix
 correlation_matrix = data.corr()
 
-# 4.2 Display correlations of features with the target variable ('default')
+# 4.2 Displays correlations of features with the target variable ('default')
 print("Correlations with Target (default):\n")
 correlation_with_target = correlation_matrix['default'].sort_values(ascending=False)
 print(correlation_with_target)
 
-# 4.3 Plot heatmap of the correlation matrix for better visualization
+# 4.3 Plots heatmap of the correlation matrix for better visualization
 plt.figure(figsize=(10, 8))
 sns.heatmap(correlation_matrix, annot=True, fmt='.2f', cmap='coolwarm', vmin=-1, vmax=1)
 plt.title('Correlation Matrix')
 plt.show()
 
-# 4.4 Flag highly correlated features (absolute correlation > 0.8)
+# 4.4 Flags highly correlated features (absolute correlation > 0.8)
 highly_correlated_features = correlation_with_target[abs(correlation_with_target) > 0.8]
 print("\nHighly Correlated Features with Target (Potential Leakage):")
 print(highly_correlated_features)
@@ -165,8 +162,8 @@ print(highly_correlated_features)
 #_______________________________________________________________________________
 
 
-# 5.3 Retrain the Random Forest model with filtered features
-# Train the filtered Random Forest model
+# 5.3 Retrains the Random Forest model with filtered features
+# Trains the filtered Random Forest model
 rf_model_filtered = RandomForestClassifier(
     n_estimators=100,
     max_depth=10,
@@ -176,11 +173,11 @@ rf_model_filtered = RandomForestClassifier(
 
 rf_model_filtered.fit(X_train_filtered, y_train_filtered)
 
-# Make predictions on the filtered test set
+# Makes predictions on the filtered test set
 y_pred_filtered = rf_model_filtered.predict(X_test_filtered)
 y_pred_proba_filtered = rf_model_filtered.predict_proba(X_test_filtered)[:, 1]
 
-# Evaluate the filtered model's performance
+# Evaluates the filtered model's performance
 print("Filtered Model Performance Metrics:\n")
 print(f"Accuracy: {accuracy_score(y_test_filtered, y_pred_filtered):.2f}")
 print(f"AUC-ROC: {roc_auc_score(y_test_filtered, y_pred_proba_filtered):.2f}\n")
@@ -193,7 +190,7 @@ feature_importances_filtered = pd.DataFrame({
     'Importance': rf_model_filtered.feature_importances_
 }).sort_values(by='Importance', ascending=False)
 
-# Plot filtered feature importances
+# Plots filtered feature importances
 plt.figure(figsize=(10, 6))
 plt.bar(feature_importances_filtered['Feature'], feature_importances_filtered['Importance'])
 plt.xlabel('Features')
@@ -201,12 +198,12 @@ plt.ylabel('Importance')
 plt.title('Feature Importances (Filtered Model)')
 plt.show()
 
-# Save the filtered model
+# Saves the filtered model
 with open('rf_model_filtered.pkl', 'wb') as f:
     pickle.dump(rf_model_filtered, f)
 
 
-#5.4 Get feature importances
+#5.4 Gets feature importances
 feature_importances_filtered = pd.DataFrame({
     'Feature': features_filtered.columns,
     'Importance': rf_model_filtered.feature_importances_
@@ -219,10 +216,7 @@ feature_importances_filtered = pd.DataFrame({
 # CHAPTER 6: Train and Evaluate Gradient Boosting Model (XGBoost)_______________
 #_______________________________________________________________________________
 
-# 6.1 Import necessary libraries
-from xgboost import XGBClassifier
-
-# 6.2 Initialize the XGBoost model
+# 6.1 Initializes the XGBoost model
 xgb_model = XGBClassifier(
     n_estimators=100,      # Number of trees
     max_depth=4,           # Maximum tree depth
@@ -231,14 +225,14 @@ xgb_model = XGBClassifier(
     scale_pos_weight=2     # Handle class imbalance
 )
 
-# 6.3 Train the XGBoost model on the filtered dataset
+# 6.2 Trains the XGBoost model on the filtered dataset
 xgb_model.fit(X_train_filtered, y_train_filtered)
 
-# 6.4 Make predictions on the test set
+# 6.3 Makes predictions on the test set
 y_pred_xgb = xgb_model.predict(X_test_filtered)
 y_pred_proba_xgb = xgb_model.predict_proba(X_test_filtered)[:, 1]
 
-# 6.5 Evaluate the XGBoost model's performance
+# 6.4 Evaluates the XGBoost model's performance
 from sklearn.metrics import classification_report, roc_auc_score, accuracy_score
 
 print("\nXGBoost Model Performance Metrics:\n")
@@ -247,17 +241,17 @@ print(f"AUC-ROC: {roc_auc_score(y_test_filtered, y_pred_proba_xgb):.2f}\n")
 print("Classification Report:")
 print(classification_report(y_test_filtered, y_pred_xgb))
 
-# 6.6 Check feature importances
+# 6.5 Checks feature importances
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Get feature importances
+# Gets feature importances
 feature_importances_xgb = pd.DataFrame({
     'Feature': features_filtered.columns,
     'Importance': xgb_model.feature_importances_
 }).sort_values(by='Importance', ascending=False)
 
-# Plot feature importances
+# Plots feature importances
 plt.figure(figsize=(10, 6))
 plt.bar(feature_importances_xgb['Feature'], feature_importances_xgb['Importance'])
 plt.xlabel('Features')
@@ -275,7 +269,7 @@ print("XGBoost performs better overall based on Accuracy, AUC-ROC, and Precision
 
 
 
-# Save the trained model to a file
+# Saves the trained model to a file
 with open('rf_model_filtered.pkl', 'wb') as f:
     pickle.dump(rf_model_filtered, f)
 
@@ -287,13 +281,13 @@ with open('rf_model_filtered.pkl', 'wb') as f:
 # CHAPTER 7: Define a Probability of Default (PD) Function
 #_______________________________________________________________________________
 
-#7.1 Define a function to calculate PD and Expected Loss
+#7.1 Defines a function to calculate PD and Expected Loss
 def calculate_pd_and_loss(model, borrower_details, loan_amount, recovery_rate=0.1):
     """
     Calculate the Probability of Default (PD) and Expected Loss for a borrower.
 
     Parameters:
-        model (sklearn model): Trained model (e.g., Random Forest).
+        model (sklearn model): Trained model (Random Forest).
         borrower_details (list): List of borrower feature values in the order of the model's training data.
         loan_amount (float): Amount of loan outstanding.
         recovery_rate (float): Recovery rate (default is 10% or 0.1).
@@ -301,16 +295,16 @@ def calculate_pd_and_loss(model, borrower_details, loan_amount, recovery_rate=0.
     Returns:
         dict: A dictionary with PD and Expected Loss.
     """
-    # Ensure the input is reshaped correctly for the model
-    borrower_array = [borrower_details]  # Convert to 2D array for the model
+    # Ensures the input is reshaped correctly for the model
+    borrower_array = [borrower_details]  # Converts to 2D array for the model
 
-    # Predict the probability of default
+    # Predicts the probability of default
     pd = model.predict_proba(borrower_array)[0][1]  # Probability of '1' (default)
 
-    # Calculate Expected Loss
+    # Calculates Expected Loss
     expected_loss = pd * (1 - recovery_rate) * loan_amount
 
-    # Return the results
+    # Returns the results
     return {"Probability of Default": pd, "Expected Loss": expected_loss}
 
 #7.2 Example usage of the function
@@ -331,7 +325,7 @@ def interactive_pd_calculator(model, feature_names, recovery_rate=0.1):
     Interactive tool for calculating Probability of Default (PD) and Expected Loss.
 
     Parameters:
-        model (sklearn model): The trained model (e.g., Random Forest).
+        model (sklearn model): The trained model (Random Forest).
         feature_names (list): List of feature names.
         recovery_rate (float): The assumed recovery rate (default is 0.1 or 10%).
 
@@ -342,25 +336,25 @@ def interactive_pd_calculator(model, feature_names, recovery_rate=0.1):
     print("Please provide the following borrower details:\n")
 
     try:
-        # Collect user inputs dynamically based on feature names
+        # Collects user inputs dynamically based on feature names
         borrower_details = []
         for feature in feature_names:
             value = input(f"Enter value for {feature.replace('_', ' ').title()} (e.g., 650): ")
             borrower_details.append(float(value))
 
-        # Predict PD
+        # Predicts PD
         pd_probability = model.predict_proba([borrower_details])[0][1]
 
-        # Calculate Expected Loss
+        # Calculates Expected Loss
         loan_amt_outstanding = borrower_details[feature_names.index('loan_amt_outstanding')]
         expected_loss = pd_probability * (1 - recovery_rate) * loan_amt_outstanding
 
-        # Display results
+        # Displays results
         print("\nResults:")
         print(f"Probability of Default (PD): {pd_probability:.2%}")
         print(f"Expected Loss: ${expected_loss:.2f}")
     except Exception as e:
         print(f"\nAn error occurred: {e}\nPlease ensure you provide valid numeric inputs.")
 
-# Run the interactive calculator
+# Runs the interactive calculator
 interactive_pd_calculator(rf_model_filtered, features_filtered.columns.tolist())
