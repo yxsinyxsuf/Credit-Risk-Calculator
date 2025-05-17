@@ -77,52 +77,127 @@ if st.button("Calculate Risk"):
 
 
 # Show the full project report below the calculator
-st.markdown("---")
-st.header("📄 Project Summary")
+st.markdown("""
+# 📊 Credit Risk Assessment Project Report
 
-with st.expander("Click to expand detailed technical report"):
-    st.markdown("""
-    ### 🎯 Objective
-    To develop a machine learning model that predicts the **Probability of Default (PD)** and **Expected Loss** for borrowers based on key financial and employment features, simulating real-world credit risk analysis.
+## 🌟 Objective
+To develop a machine learning model that predicts the **Probability of Default (PD)** and **Expected Loss** for borrowers based on key financial and employment features, simulating real-world credit risk analysis.
 
-    ### 📁 Dataset Summary
-    **Features used**: `fico_score`, `income`, `years_employed`, `loan_amt_outstanding`  
-    **Removed due to data leakage**: `credit_lines_outstanding`, `total_debt_outstanding`
+---
 
-    ### ⚙️ Workflow
-    - Cleaned and preprocessed the data
-    - Removed leaked features
-    - Split into training/testing sets (80/20)
-    - Trained and compared models: Random Forest, XGBoost
+## 📄 Dataset Summary
+**Source**: Loan Data CSV file  
+**Relevant Features**:
+- `fico_score`: Credit score of the borrower
+- `income`: Annual income
+- `years_employed`: Number of years employed
+- `loan_amt_outstanding`: Outstanding loan amount
 
-    ### ✅ Final Model: Random Forest Classifier
-    - **Accuracy**: ~77%
-    - **AUC-ROC**: ~0.76
-    - **Recall for default cases**: ~56%
-    - Chosen over XGBoost due to better recall and interpretability
+**Removed Features (Leakage Identified)**:
+- `credit_lines_outstanding`
+- `total_debt_outstanding`
 
-    ### 🧠 Challenges & Fixes
-    - **Overfitting**: Detected 100% training accuracy → fixed by removing leaked features
-    - **Data Leakage**: Found and dropped variables with direct info about target
-    - **Edge Case Testing**: Created profiles to test extreme borrower scenarios
+---
 
-    ### 🌐 App Features
-    - Collects borrower data via form
-    - Calculates PD using trained Random Forest
-    - Computes Expected Loss using:
-      ```
-      Expected Loss = PD × (1 - Recovery Rate) × Loan Amount
-      ```
+## ⚙️ Workflow Overview
 
-    ### 🧰 Tools Used
-    - Python (Scikit-learn, Pandas)
-    - Streamlit for deployment
-    - Joblib for model serialization
+### ✏️ Data Preprocessing
+- Loaded dataset using Pandas.
+- Dropped features causing data leakage.
+- Verified and cleaned data types.
+- Split dataset into **80% training** and **20% testing**.
 
-    ### 🚀 Next Steps
-    - Add feature visualizations
-    - Deploy on Streamlit Cloud
-    - Enhance input flexibility and model tuning
-    """)
+### 📊 Model Training & Evaluation
+
+#### Random Forest Classifier (Selected Model)
+- **Pros**: Handles non-linear data, interpretable, balanced performance.
+- **Metrics**:
+  - Accuracy: ~77%
+  - AUC-ROC: ~0.76
+  - High Recall for Class 1 (defaults): ~56%
+
+#### XGBoost Classifier (Benchmark Model)
+- **Pros**: Stronger precision, gradient boosting technique.
+- **Metrics**:
+  - Accuracy: ~81%
+  - AUC-ROC: ~0.77
+  - Precision up, but recall down (~43%)
+
+#### Final Choice: **Random Forest**
+- Chosen for its **better recall**, which is critical in credit risk.
+- Feature importance was interpretable and balanced.
+
+### 📊 Feature Importance
+- Top predictors:
+  - `fico_score`
+  - `years_employed`
+  - `income`
+- Less impactful:
+  - `loan_amt_outstanding`
+
+---
+
+## 🧠 Challenges Faced
+
+### ❌ Overfitting
+- Initial model gave 100% training accuracy.
+- **Fix**: Validated on separate test set, confirmed leakage, dropped leaked features.
+
+### ⚠️ Data Leakage
+- Features like `total_debt_outstanding` revealed direct info about default status.
+- **Fix**: Manually dropped such features and retrained the model.
+
+### 🤷 Model Selection Struggles
+- Logistic Regression failed to generalize.
+- XGBoost was overconfident but missed risk cases.
+- **Fix**: Focused on Random Forest for recall and interpretability.
+
+### ⚖️ Testing Edge Cases
+- Profiles with low FICO, high loans, etc.
+- **Fix**: Created edge case testing function. Model handled most edge cases well.
+
+### 🚧 Local Development Barriers
+- PATH issues, terminal errors, environment setup.
+- **Fix**: Resolved via environment variable setup, Python + pip fixes, and Streamlit.
+
+---
+
+## 🌐 Streamlit App Functionality
+- Allows users to input:
+  - FICO Score
+  - Income
+  - Years Employed
+  - Loan Amount
+- Computes:
+  - **Probability of Default** using Random Forest model
+  - **Expected Loss** using:  
+    `Expected Loss = PD × (1 - Recovery Rate) × Loan Amount`
+- Displayed in real time through an interactive UI.
+
+---
+
+## 🚀 Key Takeaways
+- Learned complete ML workflow: from raw CSV to deployed web app.
+- Understood impact of feature leakage and proper testing.
+- Balanced model selection with real-world cost (false negatives).
+- Gained hands-on experience with:
+  - Scikit-learn
+  - Random Forests and XGBoost
+  - Streamlit for web app deployment
+  - Virtual environments and package management
+
+---
+
+## 🚤 Next Steps
+- Save the model with `joblib` and reuse without retraining.
+- Improve feature set (e.g., employment type, loan purpose).
+- Deploy the app on **Streamlit Cloud** or **Heroku**.
+- Add data visualizations (e.g., feature importances, risk profiles).
+
+---
+
+*This report reflects an end-to-end machine learning project tailored for real-world credit scoring and will serve as a valuable showcase of applied data science and deployment skills.*
+""")
+
 
 
