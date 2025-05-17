@@ -187,16 +187,6 @@ To develop a machine learning model that predicts the **Probability of Default (
   - Virtual environments and package management
 
 ---
-
-## 🚤 Next Steps
-- Save the model with `joblib` and reuse without retraining.
-- Improve feature set (e.g., employment type, loan purpose).
-- Deploy the app on **Streamlit Cloud** or **Heroku**.
-- Add data visualizations (e.g., feature importances, risk profiles).
-
----
-
-*This report reflects an end-to-end machine learning project tailored for real-world credit scoring and will serve as a valuable showcase of applied data science and deployment skills.*
 """)
 
 
