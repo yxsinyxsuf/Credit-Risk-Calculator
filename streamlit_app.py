@@ -27,6 +27,23 @@ st.markdown(
     "You can use the included `Loan_Data.csv` as a sample, or proceed directly to using the calculator below."
 )
 
+
+import streamlit as st
+import pandas as pd
+
+# Load your example dataset
+df = pd.read_csv("loan_data.csv")  # Ensure this file is in your working directory
+
+# Display a download button
+st.download_button(
+    label="📥 Download Example Dataset",
+    data=df.to_csv(index=False).encode("utf-8"),
+    file_name="loan_data.csv",
+    mime="text/csv"
+)
+
+
+
 if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
     st.write("Dataset Preview:")
@@ -78,14 +95,14 @@ if st.button("Calculate Risk"):
 
 # Show the full project report below the calculator
 st.markdown("""
-# 📊 Credit Risk Assessment Project Report
+# Credit Risk Assessment Project Report
 
-## 🌟 Objective
+## Objective
 To develop a machine learning model that predicts the **Probability of Default (PD)** and **Expected Loss** for borrowers based on key financial and employment features, simulating real-world credit risk analysis.
 
 ---
 
-## 📄 Dataset Summary
+## Dataset Summary
 **Source**: Loan Data CSV file  
 **Relevant Features**:
 - `fico_score`: Credit score of the borrower
@@ -99,15 +116,15 @@ To develop a machine learning model that predicts the **Probability of Default (
 
 ---
 
-## ⚙️ Workflow Overview
+## Workflow Overview
 
-### ✏️ Data Preprocessing
+### Data Preprocessing
 - Loaded dataset using Pandas.
 - Dropped features causing data leakage.
 - Verified and cleaned data types.
 - Split dataset into **80% training** and **20% testing**.
 
-### 📊 Model Training & Evaluation
+### Model Training & Evaluation
 
 #### Random Forest Classifier (Selected Model)
 - **Pros**: Handles non-linear data, interpretable, balanced performance.
@@ -127,7 +144,7 @@ To develop a machine learning model that predicts the **Probability of Default (
 - Chosen for its **better recall**, which is critical in credit risk.
 - Feature importance was interpretable and balanced.
 
-### 📊 Feature Importance
+### Feature Importance
 - Top predictors:
   - `fico_score`
   - `years_employed`
@@ -137,32 +154,32 @@ To develop a machine learning model that predicts the **Probability of Default (
 
 ---
 
-## 🧠 Challenges Faced
+## Challenges Faced
 
-### ❌ Overfitting
+### Overfitting
 - Initial model gave 100% training accuracy.
 - **Fix**: Validated on separate test set, confirmed leakage, dropped leaked features.
 
-### ⚠️ Data Leakage
+### ⚠Data Leakage
 - Features like `total_debt_outstanding` revealed direct info about default status.
 - **Fix**: Manually dropped such features and retrained the model.
 
-### 🤷 Model Selection Struggles
+### Model Selection Struggles
 - Logistic Regression failed to generalize.
 - XGBoost was overconfident but missed risk cases.
 - **Fix**: Focused on Random Forest for recall and interpretability.
 
-### ⚖️ Testing Edge Cases
+### ⚖Testing Edge Cases
 - Profiles with low FICO, high loans, etc.
 - **Fix**: Created edge case testing function. Model handled most edge cases well.
 
-### 🚧 Local Development Barriers
+### Local Development Barriers
 - PATH issues, terminal errors, environment setup.
 - **Fix**: Resolved via environment variable setup, Python + pip fixes, and Streamlit.
 
 ---
 
-## 🌐 Streamlit App Functionality
+## Streamlit App Functionality
 - Allows users to input:
   - FICO Score
   - Income
@@ -176,7 +193,7 @@ To develop a machine learning model that predicts the **Probability of Default (
 
 ---
 
-## 🚀 Key Takeaways
+## Key Takeaways
 - Learned complete ML workflow: from raw CSV to deployed web app.
 - Understood impact of feature leakage and proper testing.
 - Balanced model selection with real-world cost (false negatives).
