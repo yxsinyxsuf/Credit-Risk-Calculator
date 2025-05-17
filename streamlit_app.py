@@ -74,3 +74,55 @@ if st.button("Calculate Risk"):
         st.write(f"**Expected Loss: ${results['Expected Loss']:.2f}**")
     else:
         st.error("Please fill in all the fields.")
+
+
+# Show the full project report below the calculator
+st.markdown("---")
+st.header("📄 Project Summary")
+
+with st.expander("Click to expand detailed technical report"):
+    st.markdown("""
+    ### 🎯 Objective
+    To develop a machine learning model that predicts the **Probability of Default (PD)** and **Expected Loss** for borrowers based on key financial and employment features, simulating real-world credit risk analysis.
+
+    ### 📁 Dataset Summary
+    **Features used**: `fico_score`, `income`, `years_employed`, `loan_amt_outstanding`  
+    **Removed due to data leakage**: `credit_lines_outstanding`, `total_debt_outstanding`
+
+    ### ⚙️ Workflow
+    - Cleaned and preprocessed the data
+    - Removed leaked features
+    - Split into training/testing sets (80/20)
+    - Trained and compared models: Random Forest, XGBoost
+
+    ### ✅ Final Model: Random Forest Classifier
+    - **Accuracy**: ~77%
+    - **AUC-ROC**: ~0.76
+    - **Recall for default cases**: ~56%
+    - Chosen over XGBoost due to better recall and interpretability
+
+    ### 🧠 Challenges & Fixes
+    - **Overfitting**: Detected 100% training accuracy → fixed by removing leaked features
+    - **Data Leakage**: Found and dropped variables with direct info about target
+    - **Edge Case Testing**: Created profiles to test extreme borrower scenarios
+
+    ### 🌐 App Features
+    - Collects borrower data via form
+    - Calculates PD using trained Random Forest
+    - Computes Expected Loss using:
+      ```
+      Expected Loss = PD × (1 - Recovery Rate) × Loan Amount
+      ```
+
+    ### 🧰 Tools Used
+    - Python (Scikit-learn, Pandas)
+    - Streamlit for deployment
+    - Joblib for model serialization
+
+    ### 🚀 Next Steps
+    - Add feature visualizations
+    - Deploy on Streamlit Cloud
+    - Enhance input flexibility and model tuning
+    """)
+
+
