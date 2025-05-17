@@ -32,13 +32,13 @@ import streamlit as st
 import pandas as pd
 
 # Load your example dataset
-df = pd.read_csv("loan_data.csv")  # Ensure this file is in your working directory
+df = pd.read_csv("Loan_Data.csv")  # Ensure this file is in your working directory
 
 # Display a download button
 st.download_button(
     label="📥 Download Example Dataset",
     data=df.to_csv(index=False).encode("utf-8"),
-    file_name="loan_data.csv",
+    file_name="Loan_Data.csv",
     mime="text/csv"
 )
 
